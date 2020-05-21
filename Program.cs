@@ -99,10 +99,7 @@ namespace MutagenBootcamp
             // Create a readonly mod object from the file path, using the overlay pattern
             using var inputMod = SkyrimMod.CreateFromBinaryOverlay(inputPath);
 
-            // Create our mod to eventually export.
-            // We create a ModKey from our output path. This will throw if the path isn't .esp/.esm
-            // ModKeys are used when specifying FormKeys that originate from this mod.
-            // Alternatively you can create a ModKey manually with its ctor
+            // Create our mod to eventually export
             var outputMod = new SkyrimMod(ModKey.Factory(Path.GetFileName(outputPath)));
 
             // Copy over all existing weapons, while changing their damage
@@ -121,7 +118,7 @@ namespace MutagenBootcamp
                 copy.BasicStats.Damage += 1;
 
                 // Add to our output mod
-                // The record is implicitly an override, as its FormKey originates from Skyrim.esm, rather than originating the output mod
+                // The record is implicitly an override, as its FormKey originates from Skyrim.esm, not our mod.
                 outputMod.Weapons.RecordCache.Set(copy);
                 System.Console.WriteLine($"Overriding {copy.EditorID}");
             }
