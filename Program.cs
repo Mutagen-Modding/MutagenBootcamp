@@ -127,6 +127,7 @@ namespace MutagenBootcamp
             }
 
             // Add our own brand new weapon
+            // This convenience function creates a new weapon already added to the mod, with a new FormID
             var overpoweredSword = outputMod.Weapons.AddNew();
             overpoweredSword.EditorID = "MutagenBlade";
             overpoweredSword.Name = "Mutagen Blade";
@@ -156,7 +157,9 @@ namespace MutagenBootcamp
             }
             else
             {
-                System.Console.WriteLine("Couldn't add our sword!  The template could not be found.");
+                System.Console.WriteLine("Couldn't create our sword!  The template could not be found.");
+                // I guess let's remove it
+                outputMod.Weapons.RecordCache.Remove(overpoweredSword);
             }
 
             // Write out our mod
