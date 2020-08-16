@@ -1,8 +1,10 @@
-﻿using Loqui;
+using Loqui;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace MutagenBootcamp
@@ -12,27 +14,30 @@ namespace MutagenBootcamp
         static void Main(string[] args)
         {
             // ToDo
-            // Set your LE Skyrim.esm path here
-            var pathToLESkyrimESM = @"D:\Games\steamapps\common\Skyrim\Data\Skyrim.esm";
+            // Set your SE Skyrim.esm path here
+            var pathToSESkyrimESM = @"D:\Games\steamapps\common\Skyrim Special Edition\Data\Skyrim.esm";
 
             // ToDo
             // Set your desired output location here
             var outputPath = @"output.esp";
 
             // Just checking you have set your data path
-            if (string.IsNullOrWhiteSpace(pathToLESkyrimESM) 
-                || !File.Exists(pathToLESkyrimESM))
+            if (string.IsNullOrWhiteSpace(pathToSESkyrimESM) 
+                || !File.Exists(pathToSESkyrimESM))
             {
                 System.Console.WriteLine("Set your Skyrim path in the main function!  Exiting.");
                 return;
             }
 
+            // Not necessary, but slightly speeds up initial bootstrapping if done explicitly
+            WarmupAll.Init();
+
             // Run some examples
             try
             {
-                PrintAllWeapons(pathToLESkyrimESM);
-                DoSomeLinking(pathToLESkyrimESM);
-                MakeAMod(pathToLESkyrimESM, outputPath);
+                PrintAllWeapons(pathToSESkyrimESM);
+                DoSomeLinking(pathToSESkyrimESM);
+                MakeAMod(pathToSESkyrimESM, outputPath);
             }
             catch (Exception ex)
             {
@@ -53,11 +58,11 @@ namespace MutagenBootcamp
         static void PrintAllWeapons(string path)
         {
             // Create a readonly mod object from the file path, using the overlay pattern
-            using var mod = SkyrimMod.CreateFromBinaryOverlay(path);
+            using var mod = SkyrimMod.CreateFromBinaryOverlay(path, SkyrimRelease.SkyrimSE);
 
             // Loop and print
             System.Console.WriteLine($"Printing all weapons:");
-            foreach (var weap in mod.Weapons.Records)
+            foreach (var weap in mod.Weapons)
             {
                 System.Console.WriteLine($"  {weap.EditorID}: {weap.FormKey}");
             }
@@ -70,13 +75,13 @@ namespace MutagenBootcamp
         static void DoSomeLinking(string path)
         {
             // Create a readonly mod object from the file path, using the overlay pattern
-            using var mod = SkyrimMod.CreateFromBinaryOverlay(path);
+            using var mod = SkyrimMod.CreateFromBinaryOverlay(path, SkyrimRelease.SkyrimSE);
 
             // Create a link cache to store info about all the linking queries we do
-            var cache = mod.CreateLinkCache();
+            var cache = mod.ToImmutableLinkCache();
 
             System.Console.WriteLine($"Printing all worn armors that Npcs have:");
-            foreach (var npc in mod.Npcs.Records)
+            foreach (var npc in mod.Npcs)
             {
                 // Attempt to find the armor, using the cache
                 if (npc.WornArmor.TryResolve(cache, out var armor))
@@ -97,13 +102,13 @@ namespace MutagenBootcamp
         public static void MakeAMod(string inputPath, string outputPath)
         {
             // Create a readonly mod object from the file path, using the overlay pattern
-            using var inputMod = SkyrimMod.CreateFromBinaryOverlay(inputPath);
+            using var inputMod = SkyrimMod.CreateFromBinaryOverlay(inputPath, SkyrimRelease.SkyrimSE);
 
             // Create our mod to eventually export
-            var outputMod = new SkyrimMod(ModKey.Factory(Path.GetFileName(outputPath)));
+            var outputMod = new SkyrimMod(ModKey.FromNameAndExtension(Path.GetFileName(outputPath)), SkyrimRelease.SkyrimSE);
 
             // Copy over all existing weapons, while changing their damage
-            foreach (var weap in inputMod.Weapons.Records)
+            foreach (var weap in inputMod.Weapons)
             {
                 // Make a copy of the readonly record so we can modify it
                 var copy = weap.DeepCopy();
@@ -115,7 +120,7 @@ namespace MutagenBootcamp
                 }
 
                 // Bump up the damage!
-                copy.BasicStats.Damage += 1;
+                copy.BasicStats.Damage += 100;
 
                 // Add to our output mod
                 // The record is implicitly an override, as its FormKey originates from Skyrim.esm, not our mod.
