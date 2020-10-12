@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace MutagenBootcamp
+namespace MutagenBootcamp.Freeform
 {
     class Program
     {
@@ -152,7 +152,7 @@ namespace MutagenBootcamp
                     {
                         Name = false,
                         EditorID = false,
-                        BasicStats = new MaskItem<bool, WeaponBasicStats.TranslationMask?>(false, default),
+                        BasicStats = false
                     });
 
                 // Now we are good to go, as our weapon is already in our mod, and has the values we want
