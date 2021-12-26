@@ -1,11 +1,10 @@
-using Loqui;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Records;
 
 namespace MutagenBootcamp.Freeform
 {

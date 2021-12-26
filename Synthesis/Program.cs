@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Synthesis;
 using System;
+using Mutagen.Bethesda.Plugins;
 
 namespace Synthesis
 {
